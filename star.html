@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Do this with me? · Branch Out</title>
+  <meta name="description" content="A friend sent you something to try together in Branch Out.">
+  <meta property="og:title" content="Do this with me?">
+  <meta property="og:description" content="A star from Branch Out, the app full of hand-picked things to try.">
+  <meta property="og:image" content="https://winstonsappsfiles.github.io/branch-out/logo.png">
+  <meta name="apple-itunes-app" content="app-id=6823779094">
+  <link rel="icon" href="/branch-out/logo.png">
+  <link rel="stylesheet" href="/branch-out/style.css">
+  <style>
+    .star { text-align: center; margin: 12px 0 28px; }
+    .orb {
+      width: 112px; height: 112px; margin: 0 auto 22px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 48px;
+      background: color-mix(in srgb, var(--branch) 18%, transparent);
+      border: 2px solid var(--branch);
+      box-shadow: 0 0 44px color-mix(in srgb, var(--branch) 55%, transparent);
+    }
+    .from { color: var(--text); font-weight: 600; margin: 0 0 6px; }
+    .star h1 { margin-bottom: 14px; }
+    .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+    .chips span {
+      padding: 4px 12px; border-radius: 999px; font-size: 15px; font-weight: 600;
+      background: var(--card); border: 1px solid var(--stroke); color: var(--text);
+    }
+    .chips .branch { color: var(--branch); border-color: color-mix(in srgb, var(--branch) 50%, transparent); }
+    .chips .plus { color: var(--gold); border-color: rgba(255, 214, 102, 0.4); }
+    .detail { margin: 18px auto 0; max-width: 520px; }
+    .links { justify-content: center; }
+    .missing { text-align: center; }
+  </style>
+</head>
+<body>
+<main>
+  <header class="brand">
+    <a href="/branch-out/"><img src="/branch-out/logo.png" alt="Branch Out app icon"></a>
+    <div>
+      <div class="name"><a href="/branch-out/">Branch Out</a></div>
+      <div class="tag">Live Beyond Your Routine</div>
+    </div>
+  </header>
+
+  <section class="star" id="star" hidden>
+    <div class="orb" id="orb"></div>
+    <p class="from" id="from"></p>
+    <h1 id="title"></h1>
+    <div class="chips" id="chips"></div>
+    <p class="detail" id="detail" hidden></p>
+  </section>
+
+  <p class="missing" id="missing" hidden>This link doesn't have a star in it. Branch Out is full of hand-picked things to try.</p>
+
+  <div class="card">
+    <p><strong>Branch Out is a map of things to try.</strong> Hundreds of hand-picked activities, most of them free. Get the app to see this star on your own map and plan when to do it.</p>
+  </div>
+
+  <div class="links">
+    <a class="primary" href="https://apps.apple.com/app/id6823779094">Get Branch Out on the App Store</a>
+    <a id="open" href="branchout://star">Open in Branch Out</a>
+  </div>
+
+  <footer>© 2026 Winston's Apps · <a href="/branch-out/privacy/">Privacy Policy</a> · <a href="/branch-out/support/">Support</a></footer>
+</main>
+<script>
+  // Everything comes from the link the app made (Shared/StarInvite.swift). No server, nothing stored.
+  const q = new URLSearchParams(location.search);
+  const get = (name, max = 80) => (q.get(name) || "").slice(0, max);
+  const icons = {
+    "Outdoors": "🌳", "Active": "🏃", "Food": "🍴", "Creative": "🎨", "Music": "🎵",
+    "Social": "👥", "Learning": "📚", "Mindful": "🍃", "Adventure": "🗺️", "Night Owl": "🌙",
+    "Make & Fix": "🔨", "Give Back": "🤲", "Extra": "✨"
+  };
+  const title = get("title");
+  if (title && get("id")) {
+    const color = /^[0-9a-f]{6}$/i.test(get("color")) ? "#" + get("color") : "#ffd666";
+    const branch = get("branch");
+    const from = get("from", 40);
+    document.documentElement.style.setProperty("--branch", color);
+    document.getElementById("orb").textContent = icons[branch] || "⭐";
+    document.getElementById("from").textContent = from ? from + " wants to do this with you" : "Do this with me?";
+    document.getElementById("title").textContent = title;
+    document.title = title + " · Branch Out";
+    const chips = document.getElementById("chips");
+    const chip = (text, cls) => {
+      if (!text) return;
+      const span = document.createElement("span");
+      span.textContent = text;
+      if (cls) span.className = cls;
+      chips.appendChild(span);
+    };
+    chip(branch, "branch");
+    chip(get("price"));
+    chip(get("time"));
+    if (q.get("plus") === "1") chip("Branch Out+", "plus");
+    if (q.get("own") === "1") chip(from ? from + "'s own star" : "Their own star");
+    const detail = get("detail", 200);
+    if (detail && q.get("own") === "1") {
+      const p = document.getElementById("detail");
+      p.textContent = detail;
+      p.hidden = false;
+    }
+    document.getElementById("star").hidden = false;
+    // For someone who has the app but landed here anyway (a link opened inside another app's browser).
+    document.getElementById("open").href = "branchout://star?" + q.toString();
+  } else {
+    document.getElementById("missing").hidden = false;
+    document.getElementById("open").hidden = true;
+  }
+</script>
+</body>
+</html>
